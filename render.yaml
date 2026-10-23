@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: jahez-attendance-api
+    runtime: node
+    plan: standard
+    region: frankfurt
+    buildCommand: npm install
+    preDeployCommand: npm run migrate
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jahez-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: CORS_ORIGINS
+        sync: false
+      - key: MAX_GPS_ACCURACY_METERS
+        value: "100"
+      - key: MAX_OFFLINE_AGE_HOURS
+        value: "168"
+      - key: REQUIRE_PHOTO_EVIDENCE
+        value: "false"
+      - key: DB_POOL_MAX
+        value: "10"
+
+databases:
+  - name: jahez-postgres
+    databaseName: jahez
+    user: jahez_app
+    plan: basic-1gb
+    region: frankfurt
+    postgresMajorVersion: "16"
+    diskSizeGB: 5
